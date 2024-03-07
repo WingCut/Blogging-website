@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { UserContext } from "../App";
 import { Navigate } from "react-router-dom";
 import EditPost from "../components/EditPost";
+import PushlishPost from "../components/PushlishPost";
 
 const blogStructure = {
   title: "",
@@ -16,7 +17,8 @@ export const BlogContext = createContext({});
 
 const CreatePost = () => {
   const [blog, setBlog] = useState(blogStructure);
-  const [createState, setCreateState] = useState("create");
+  const [createBlogState, setCreateBlogState] = useState("editor");
+  const [textBlog, setTextBlog] = useState({ state: false });
 
   const {
     userAuth: { user_token },
@@ -24,14 +26,21 @@ const CreatePost = () => {
   } = useContext(UserContext);
   return (
     <BlogContext.Provider
-      value={{ blog, setBlog, createState, setCreateState }}
+      value={{
+        blog,
+        setBlog,
+        createBlogState,
+        setCreateBlogState,
+        textBlog,
+        setTextBlog,
+      }}
     >
       {user_token === null ? (
         <Navigate to="/login" />
-      ) : createState === "create" ? (
+      ) : createBlogState === "editor" ? (
         <EditPost />
       ) : (
-        <h1>Pushlish post</h1>
+        <PushlishPost />
       )}
     </BlogContext.Provider>
   );
