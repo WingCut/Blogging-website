@@ -1,13 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
-import jwt from "jsonwebtoken";
 import cors from "cors";
-
-//model
-import User from "./models/userModel.js";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
 
 //routers
 import authRouter from "./routes/authRouter.js";
@@ -16,8 +13,6 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
-const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
-const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
 mongoose.connect(process.env.MONGO_URL, {
   autoIndex: true,
@@ -30,7 +25,40 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.post("/uploadUrl", (req, res) => {});
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "blog-website",
+    allowedFormats: ["jpg", "png", "gif"],
+    transformation: [
+      { width: 1000, crop: "scale" },
+      { quality: "auto" },
+      { fetch_format: "auto" },
+    ],
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.post(
+  "/uploadUrl",
+  upload.fields([{ name: "image" }]),
+  async (req, res, next) => {
+    const file = req.files["image"][0];
+    if (!file) {
+      next(new Error("No file uploaded!"));
+      return;
+    }
+
+    res.json({ secure_url: file.path });
+  }
+);
 
 app.use("/api/auth", authRouter);
 
@@ -38,6 +66,14 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+// import bcrypt from "bcrypt";
+// import { nanoid } from "nanoid";
+// import jwt from "jsonwebtoken";
+
+//model
+// import User from "./models/userModel.js";
+// const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
+// const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 // auth Controler
 // const formatDatatoSend = (user) => {
 //   const user_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
