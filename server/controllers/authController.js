@@ -1,18 +1,19 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
+import { formatDatatoSend } from "../middleware/authMiddleware.js";
 
-const formatDatatoSend = (user) => {
-  const user_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+// const formatDatatoSend = (user) => {
+//   const user_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-  return {
-    user_token,
-    fullname: user.user_info.fullname,
-    username: user.user_info.username,
-    profile_img: user.user_info.profile_img,
-  };
-};
+//   return {
+//     user_token,
+//     fullname: user.user_info.fullname,
+//     username: user.user_info.username,
+//     profile_img: user.user_info.profile_img,
+//   };
+// };
 
 const generateUsername = async (email) => {
   const username = await generateUsername(email);

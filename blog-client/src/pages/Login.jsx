@@ -17,7 +17,7 @@ const Login = () => {
 
   const handleSubmitForm = (formData) => {
     axios
-      .post("http://localhost:3000/api/auth/login", formData)
+      .post("http://localhost:3000/login", formData)
       .then(({ data }) => {
         storeInSession("user", JSON.stringify(data));
         setUserAuth(data);

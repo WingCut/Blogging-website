@@ -6,7 +6,7 @@ import PushlishPost from "../components/PushlishPost";
 
 const blogStructure = {
   title: "",
-  image: "",
+  banner: "",
   content: [],
   tags: [],
   des: "",

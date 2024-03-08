@@ -11,7 +11,7 @@ const Register = () => {
 
   const handleSubmitForm = (formData) => {
     axios
-      .post("http://localhost:3000/api/auth/register", formData)
+      .post("http://localhost:3000/register", formData)
       .then(({ data }) => {
         toast.success("Tạo tài khoản thành công");
         navigate("/login");
@@ -24,38 +24,12 @@ const Register = () => {
   const handleSubmitBtn = (e) => {
     e.preventDefault();
 
-    // const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
-    // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
-
     const form = new FormData(authForm.current);
     const formData = {};
 
     for (const [key, value] of form.entries()) {
       formData[key] = value;
     }
-
-    // const { fullname, email, password } = formData;
-
-    // if (fullname.length < 3 || fullname === "") {
-    //   return toast.error("Họ tên cần dài hơn 3 ký tự");
-    // }
-
-    // if (!email.length) {
-    //   return toast.error("Hãy nhập Email");
-    // }
-
-    // if (!emailRegex.test(email)) {
-    //   return toast.error("Email không hợp lệ");
-    // }
-
-    // if (!password || password === "") {
-    //   return toast.error("Hãy nhập mật khẩu");
-    // }
-    // if (!passwordRegex.test(password)) {
-    //   return toast.error(
-    //     "Mật khẩu phải dài ít nhất 6 đến 20 ký tự, bao gồm 1 chữ số, 1 chữ hoa và 1 chữ thường"
-    //   );
-    // }
 
     handleSubmitForm(formData);
   };

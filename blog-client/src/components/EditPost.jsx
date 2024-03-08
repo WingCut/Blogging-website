@@ -8,12 +8,11 @@ import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
 
 const EditPost = () => {
-  const [imageUrl, setImageUrl] = useState("");
-  // const blogRef = useRef();
+  // const [imageUrl, setImageUrl] = useState("");
 
   const {
     blog,
-    blog: { title, image, content, tags, des },
+    blog: { title, banner, content, tags, des },
     setBlog,
     textBlog,
     setTextBlog,
@@ -41,10 +40,10 @@ const EditPost = () => {
         const data = await imageUpload(uploadData);
         toast.dismiss(loadingToast);
         toast.success("Ảnh đã được tải lên");
-        setImageUrl(data.secure_url);
-        setBlog({ ...blog, image: data.secure_url });
+        //setImageUrl(data.secure_url);
+        setBlog({ ...blog, banner: data.secure_url });
       })
-      .catch((err) => console.error("Error uploading image:", err));
+      .catch((err) => console.error("Lỗi tải ảnh:", err));
   };
 
   const handleTitleKeyDown = (e) => {
@@ -65,27 +64,27 @@ const EditPost = () => {
   };
 
   const handlePublishBtn = () => {
-    // if (!image.length) {
-    //   return toast.error("Hãy tải ảnh đại diện blog!");
-    // }
-    // if (!title.length) {
-    //   return toast.error("Hãy nhập tiêu đề blog!");
-    // }
-    // if (!textBlog.state) {
-    textBlog
-      .save()
-      .then((data) => {
-        //   if (data.blocks.length) {
-        setBlog({ ...blog, content: data });
-        setCreateBlogState("publish");
-        //   } else {
-        //     return toast.error("Hãy thêm nội dung bài viết!");
-        //   }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    // }
+    if (!banner.length) {
+      return toast.error("Hãy tải ảnh đại diện bài viết!");
+    }
+    if (!title.length) {
+      return toast.error("Hãy thêm tiêu đề bài viết!");
+    }
+    if (!textBlog.state) {
+      textBlog
+        .save()
+        .then((data) => {
+          if (data.blocks.length) {
+            setBlog({ ...blog, content: data });
+            setCreateBlogState("publish");
+          } else {
+            return toast.error("Hãy thêm nội dung bài viết!");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   return (
@@ -99,17 +98,17 @@ const EditPost = () => {
         <p className="max-md:hidden text-black w-full">Tạo bài viết mới</p>
         <div className="flex gap-2 px-2 ml-auto">
           <button className="btn-dark" type="submit" onClick={handlePublishBtn}>
-            Đăng Blog
+            Đăng
           </button>
-          <button className="btn-light ">Lưu Blog</button>
+          <button className="btn-light ">Lưu </button>
         </div>
       </nav>
       <Toaster />
       <section>
         <div className="mx-auto max-w-[900px] w-full">
-          <div className="relative aspect-video border-4 border-[#F3F3F3]">
+          <div className="relative aspect-video border-4 border-white">
             <label htmlFor="uploadImage">
-              <img src={image} className="z-10" onError={handleError} />
+              <img src={banner} className="z-10" onError={handleError} />
               <input
                 id="uploadImage"
                 type="file"
