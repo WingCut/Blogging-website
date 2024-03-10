@@ -14,7 +14,9 @@ const Register = () => {
       .post("http://localhost:3000/register", formData)
       .then(({ data }) => {
         toast.success("Tạo tài khoản thành công");
-        navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
       })
       .catch(({ response }) => {
         toast.error(response.data.error);

@@ -2,16 +2,23 @@ import { useContext } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { BlogContext } from "../pages/CreatePost";
 import Tags from "./Tags";
+import axios from "axios";
+import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
-const PushlishPost = () => {
+const PublishPost = () => {
+  const navigate = useNavigate();
   const limitCharacter = 200;
   const tagLimit = 10;
   const {
     blog,
-    blog: { title, banner, tags, des },
+    blog: { title, banner, content, tags, des },
     setBlog,
     setCreateBlogState,
   } = useContext(BlogContext);
+  const {
+    userAuth: { user_token },
+  } = useContext(UserContext);
 
   const handleCloseEvent = () => {
     setCreateBlogState("editor");
@@ -46,6 +53,35 @@ const PushlishPost = () => {
       }
       e.target.value = "";
     }
+  };
+
+  const handlePublishBlog = (e) => {
+    if (e.target.className.includes("disable")) {
+      return;
+    }
+
+    const loadingToast = toast.loading("Đang đăng bài viết...");
+    e.target.classList.add("disable");
+    const blogObj = { title, banner, content, des, tags };
+    axios
+      .post("http://localhost:3000/create-blog", blogObj, {
+        headers: {
+          Authorization: `Bearer ${user_token}`,
+        },
+      })
+      .then(() => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        toast.success("Bài viết đã được đăng");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      })
+      .catch(({ response }) => {
+        e.target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+        toast.error(response.data.error);
+      });
   };
 
   return (
@@ -106,9 +142,11 @@ const PushlishPost = () => {
         <p className="mt-1 text-[#6B6B6B] text-sm text-right">
           {tagLimit - tags.length} chủ đề
         </p>
-        <button className="btn-dark px-8 mt-4">Đăng</button>
+        <button className="btn-dark px-8 mt-4" onClick={handlePublishBlog}>
+          Đăng
+        </button>
       </div>
     </section>
   );
 };
-export default PushlishPost;
+export default PublishPost;

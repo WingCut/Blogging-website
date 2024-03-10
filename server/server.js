@@ -11,6 +11,7 @@ import { nanoid } from "nanoid";
 
 //model
 import User from "./models/userModel.js";
+import Blog from "./models/blogModel.js";
 
 dotenv.config();
 const app = express();
@@ -191,7 +192,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/create-blog", verifyJWT, (req, res) => {
-  const authorId = req.user;
+  const author_id = req.user;
   const { title, banner, content, des, tags, draft } = req.body;
 
   if (!title.length) {
@@ -208,6 +209,53 @@ app.post("/create-blog", verifyJWT, (req, res) => {
   if (!content.blocks.length) {
     return res.status(403).json({ error: "Hãy thêm nội bài viết!" });
   }
+  if (!tags.length || tags.length > 10) {
+    return res
+      .status(403)
+      .json({ error: "Thêm tối đa 10 chủ đề cho bài viết!" });
+  }
+
+  const fomatTags = tags.map((tag) => tag.toLowerCase());
+  const blog_id =
+    title
+      .replace(/[^a-zA-Z0-9]/g, " ")
+      .replace(/\s+/g, "-")
+      .trim() + nanoid();
+  const blog = new Blog({
+    title: title,
+    banner: banner,
+    content: content,
+    des: des,
+    tags: tags,
+    author: author_id,
+    blog_id: blog_id,
+    draft: Boolean(draft),
+  });
+
+  blog
+    .save()
+    .then((blog) => {
+      const increValue = draft ? 0 : 1;
+
+      User.findOneAndUpdate(
+        { _id: author_id },
+        {
+          $inc: { "account_info.total_posts": increValue },
+          $push: { blogs: blog._id },
+        }
+      )
+        .then((user) => {
+          return res.status(200).json({ id: blog.blog_id });
+        })
+        .catch((err) => {
+          return res
+            .status(500)
+            .json({ error: "Lỗi khi cập nhập tổng số bài viết" });
+        });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
 });
 
 app.listen(PORT, () => {

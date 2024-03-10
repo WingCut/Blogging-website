@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { UserContext } from "../App";
 import { Navigate } from "react-router-dom";
 import EditPost from "../components/EditPost";
-import PushlishPost from "../components/PushlishPost";
+import PublishPost from "../components/PublishPost";
 
 const blogStructure = {
   title: "",
@@ -40,7 +40,7 @@ const CreatePost = () => {
       ) : createBlogState === "editor" ? (
         <EditPost />
       ) : (
-        <PushlishPost />
+        <PublishPost />
       )}
     </BlogContext.Provider>
   );

@@ -30,7 +30,7 @@ const EditPost = () => {
     );
   }, []);
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     e.preventDefault();
     const uploadData = new FormData();
     uploadData.append("image", e.target.files[0], "image");
@@ -40,7 +40,6 @@ const EditPost = () => {
         const data = await imageUpload(uploadData);
         toast.dismiss(loadingToast);
         toast.success("Ảnh đã được tải lên");
-        //setImageUrl(data.secure_url);
         setBlog({ ...blog, banner: data.secure_url });
       })
       .catch((err) => console.error("Lỗi tải ảnh:", err));
