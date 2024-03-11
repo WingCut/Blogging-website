@@ -38,7 +38,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "blog-website",
-    allowedFormats: ["jpg", "png", "gif"],
+    allowedFormats: ["jpg", "png", "gif", ".jpeg"],
     transformation: [
       { width: 1000, crop: "scale" },
       { quality: "auto" },
