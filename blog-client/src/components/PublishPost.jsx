@@ -62,7 +62,7 @@ const PublishPost = () => {
 
     const loadingToast = toast.loading("Đang đăng bài viết...");
     e.target.classList.add("disable");
-    const blogObj = { title, banner, content, des, tags };
+    const blogObj = { title, banner, content, des, tags, draft: false };
     axios
       .post("http://localhost:3000/create-blog", blogObj, {
         headers: {

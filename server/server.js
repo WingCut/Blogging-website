@@ -198,24 +198,27 @@ app.post("/create-blog", verifyJWT, (req, res) => {
   if (!title.length) {
     return res.status(403).json({ error: "Hãy thêm tiêu đề bài viết!" });
   }
-  if (!banner.length) {
-    return res.status(403).json({ error: "Hãy tải ảnh đại diện bài viết!" });
-  }
-  if (!des.length || des.length > 200) {
-    return res
-      .status(403)
-      .json({ error: "Mô tả ngắn về bài viết dưới 200 kí tự" });
-  }
-  if (!content.blocks.length) {
-    return res.status(403).json({ error: "Hãy thêm nội bài viết!" });
-  }
-  if (!tags.length || tags.length > 10) {
-    return res
-      .status(403)
-      .json({ error: "Thêm tối đa 10 chủ đề cho bài viết!" });
+
+  if (!draft) {
+    if (!banner.length) {
+      return res.status(403).json({ error: "Hãy tải ảnh đại diện bài viết!" });
+    }
+    if (!des.length || des.length > 200) {
+      return res
+        .status(403)
+        .json({ error: "Mô tả ngắn về bài viết dưới 200 kí tự" });
+    }
+    if (!content.blocks.length) {
+      return res.status(403).json({ error: "Hãy thêm nội bài viết!" });
+    }
+    if (!tags.length || tags.length > 10) {
+      return res
+        .status(403)
+        .json({ error: "Thêm tối đa 10 chủ đề cho bài viết!" });
+    }
   }
 
-  const fomatTags = tags.map((tag) => tag.toLowerCase());
+  const formatTags = tags.map((tag) => tag.toLowerCase());
   const blog_id =
     title
       .replace(/[^a-zA-Z0-9]/g, " ")
@@ -226,7 +229,7 @@ app.post("/create-blog", verifyJWT, (req, res) => {
     banner: banner,
     content: content,
     des: des,
-    tags: tags,
+    tags: formatTags,
     author: author_id,
     blog_id: blog_id,
     draft: Boolean(draft),

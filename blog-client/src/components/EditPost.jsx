@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import blogBanner from "../assets/imgs/blog banner.png";
 import { useContext, useEffect, useRef, useState } from "react";
 import { imageUpload } from "./ImageUpload";
@@ -6,10 +6,12 @@ import toast, { Toaster } from "react-hot-toast";
 import { BlogContext } from "../pages/CreatePost";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./Tools";
+import axios from "axios";
+import { UserContext } from "../App";
 
 const EditPost = () => {
   // const [imageUrl, setImageUrl] = useState("");
-
+  const navigate = useNavigate();
   const {
     blog,
     blog: { title, banner, content, tags, des },
@@ -19,30 +21,40 @@ const EditPost = () => {
     setCreateBlogState,
   } = useContext(BlogContext);
 
+  const {
+    userAuth: { user_token },
+  } = useContext(UserContext);
+
   useEffect(() => {
-    setTextBlog(
-      new EditorJS({
-        holderId: "textEditor",
-        data: content,
-        tools: tools,
-        placeholder: "Nội dung bài viết....",
-      })
-    );
+    if (!textBlog.state) {
+      setTextBlog(
+        new EditorJS({
+          holderId: "textEditor",
+          data: content,
+          tools: tools,
+          placeholder: "Nội dung bài viết....",
+        })
+      );
+    }
   }, []);
 
   const handleFileUpload = (e) => {
     e.preventDefault();
     const uploadData = new FormData();
     uploadData.append("image", e.target.files[0], "image");
+
+    const loadingToast = toast.loading("Đang tải ảnh lên....");
     imageUpload(uploadData)
-      .then(async () => {
-        const loadingToast = toast.loading("Đang tải ảnh lên....");
-        const data = await imageUpload(uploadData);
+      .then(async (data) => {
         toast.dismiss(loadingToast);
         toast.success("Ảnh đã được tải lên");
         setBlog({ ...blog, banner: data.secure_url });
       })
-      .catch((err) => console.error("Lỗi tải ảnh:", err));
+      .catch((err) => {
+        toast.dismiss(loadingToast);
+        console.error("Lỗi tải ảnh:", err);
+        toast.error("Lỗi trong quá trình tải ảnh");
+      });
   };
 
   const handleTitleKeyDown = (e) => {
@@ -86,6 +98,40 @@ const EditPost = () => {
     }
   };
 
+  const handleSaveBlog = (e) => {
+    if (e.target.className.includes("disable")) {
+      return;
+    }
+
+    const loadingToast = toast.loading("Đang lưu bài viết...");
+    e.target.classList.add("disable");
+
+    if (!textBlog.state) {
+      textBlog.save().then((content) => {
+        const blogObj = { title, banner, content, des, tags, draft: true };
+        axios
+          .post("http://localhost:3000/create-blog", blogObj, {
+            headers: {
+              Authorization: `Bearer ${user_token}`,
+            },
+          })
+          .then(() => {
+            e.target.classList.remove("disable");
+            toast.dismiss(loadingToast);
+            toast.success("Bài viết đã được lưu");
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+          })
+          .catch(({ response }) => {
+            e.target.classList.remove("disable");
+            toast.dismiss(loadingToast);
+            toast.error(response.data.error);
+          });
+      });
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -99,7 +145,9 @@ const EditPost = () => {
           <button className="btn-dark" type="submit" onClick={handlePublishBtn}>
             Đăng
           </button>
-          <button className="btn-light ">Lưu </button>
+          <button className="btn-light" onClick={handleSaveBlog}>
+            Lưu
+          </button>
         </div>
       </nav>
       <Toaster />
