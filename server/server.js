@@ -105,6 +105,7 @@ const generateUsername = async (email) => {
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
+// Thêm người dùng
 app.post("/register", (req, res) => {
   let { fullname, email, password } = req.body;
 
@@ -150,6 +151,7 @@ app.post("/register", (req, res) => {
   });
 });
 
+// Login người dùng
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -191,6 +193,49 @@ app.post("/login", (req, res) => {
     });
 });
 
+//Lấy blog mới nhất
+app.get("/latest-blogs", (req, res) => {
+  const maxLimit = 5;
+
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "user_info.profile_img user_info.fullname user_info.username -_id"
+    )
+    .sort({ publishAt: -1 })
+    .select("blog_id title des banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+//Lấy blog xu hướng
+app.get("/trending-blogs", (req, res) => {
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "user_info.profile_img user_info.fullname user_info.username -_id"
+    )
+    .sort({
+      "activity.total_reads": -1,
+      "activity.total_likes": -1,
+      publishedAt: -1,
+    })
+    .select("blog_id title publishedAt")
+    .limit(5)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+//Tạo bài viết
 app.post("/create-blog", verifyJWT, (req, res) => {
   const author_id = req.user;
   const { title, banner, content, des, tags, draft } = req.body;
@@ -221,7 +266,9 @@ app.post("/create-blog", verifyJWT, (req, res) => {
   const formatTags = tags.map((tag) => tag.toLowerCase());
   const blog_id =
     title
-      .replace(/[^a-zA-Z0-9]/g, " ")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      // .replace(/[^a-zA-Z0-9]/g, " ")
       .replace(/\s+/g, "-")
       .trim() + nanoid();
   const blog = new Blog({
