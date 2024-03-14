@@ -67,6 +67,9 @@ const HomePage = () => {
           <div className="flex flex-col gap-10">
             <h1 className="font-medium text-xl mb-8">Các chủ đề xu hướng</h1>
           </div>
+          <div>
+            <h1 className="">Blogging</h1>
+          </div>
         </div>
       </section>
     </>
