@@ -1,4 +1,4 @@
-import { getDay } from "../commom/date";
+import { getDay } from "../common/date";
 import { Link } from "react-router-dom";
 
 const BlogCard = ({ content, author }) => {

@@ -4,7 +4,7 @@ import googleIcon from "../assets/imgs/google.png";
 import { Link, Navigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { storeInSession } from "../commom/session";
+import { storeInSession } from "../common/session";
 import { UserContext } from "../App";
 
 const Login = () => {

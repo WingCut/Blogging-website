@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
 import CreatePost from "./pages/CreatePost";
 import Navbar from "./components/Navbar";
-import { logInSession } from "./commom/session";
+import { logInSession } from "./common/session";
 export const UserContext = createContext({});
 
 function App() {

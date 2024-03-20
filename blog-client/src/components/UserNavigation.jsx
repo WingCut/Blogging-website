@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../App";
-import { removeFromSession } from "../commom/session";
+import { removeFromSession } from "../common/session";
 
 const UserNavigation = () => {
   const {

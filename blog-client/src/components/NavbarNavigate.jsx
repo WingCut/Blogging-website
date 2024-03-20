@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 
+export let activeLineRef;
+export let activeTabRef;
+
 const NavbarNavigate = ({
   routes,
   hidden = [],
   defaultRoute = 0,
   children,
 }) => {
-  const activeLineRef = useRef();
-  const activeTabRef = useRef();
+  activeLineRef = useRef();
+  activeTabRef = useRef();
   const [activeNav, setActiveNav] = useState(defaultRoute);
   const handleActiveNav = (btn, i) => {
     const { offsetWidth, offsetLeft } = btn;

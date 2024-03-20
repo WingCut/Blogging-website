@@ -3,7 +3,7 @@ const Loader = () => {
     <div className="w-12 mx-auto my-8">
       <svg
         aria-hidden="true"
-        className="w-12 h-12 mr-2 text-white animate-spin fill-dark-grey"
+        className="w-12 h-12 mr-2 text-white animate-spin fill-[#6B6B6B]"
         viewBox="0 0 100 101"
         fill="none"
       >

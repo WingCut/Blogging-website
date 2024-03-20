@@ -43,3 +43,7 @@ body {
 .input-box {
   @apply w-[100%] rounded-md p-4 bg-[#F3F3F3] pl-12 border border-[#F3F3F3] focus:bg-transparent placeholder:text-[#242424];
 }
+
+.tag {
+  @apply p-3 bg-[#F3F3F3] rounded-full px-6 capitalize;
+}
