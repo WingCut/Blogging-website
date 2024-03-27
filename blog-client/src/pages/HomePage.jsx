@@ -5,6 +5,9 @@ import Loader from "../components/Loader";
 import BlogCard from "../components/BlogCard";
 import TrendingBlogCard from "../components/TrendingBlogCard";
 import { activeTabRef } from "../components/NavbarNavigate";
+import NodataMessage from "../components/NodataMessage";
+import { paginationData } from "../common/pagination";
+import BtnPagination from "../components/BtnPagination";
 
 const HomePage = () => {
   const [blogs, setBlogs] = useState(null);
@@ -22,10 +25,18 @@ const HomePage = () => {
     "thời trang",
   ];
 
-  const fetchLatesBlogs = () => {
+  const fetchLatesBlogs = (page = 1) => {
     axios
-      .get("http://localhost:3000/latest-blogs")
-      .then(({ data }) => setBlogs(data.blogs))
+      .post("http://localhost:3000/latest-blogs", { page })
+      .then(async ({ data }) => {
+        const formatedData = await paginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countPage: "latest-blogs-count",
+        });
+        setBlogs(formatedData);
+      })
       .catch((err) => console.log(err));
   };
 
@@ -83,8 +94,8 @@ const HomePage = () => {
             <>
               {blogs === null ? (
                 <Loader />
-              ) : (
-                blogs.map((blog, i) => {
+              ) : blogs.results.length ? (
+                blogs.results.map((blog, i) => {
                   return (
                     <BlogCard
                       key={i}
@@ -93,15 +104,20 @@ const HomePage = () => {
                     />
                   );
                 })
+              ) : (
+                <NodataMessage message={"Chưa có bài đăng nào"} />
               )}
+              <BtnPagination />
             </>
 
             {trendingBlogs === null ? (
               <Loader />
-            ) : (
+            ) : trendingBlogs.length ? (
               trendingBlogs.map((blog, i) => {
                 return <TrendingBlogCard key={i} index={i} blog={blog} />;
               })
+            ) : (
+              <NodataMessage message={"Chưa có bài đăng nào"} />
             )}
           </NavbarNavigate>
         </div>
@@ -136,10 +152,12 @@ const HomePage = () => {
               </h1>
               {trendingBlogs === null ? (
                 <Loader />
-              ) : (
+              ) : trendingBlogs.length ? (
                 trendingBlogs.map((blog, i) => {
                   return <TrendingBlogCard key={i} index={i} blog={blog} />;
                 })
+              ) : (
+                <NodataMessage message={"Chưa có bài đăng nào"} />
               )}
             </div>
           </div>

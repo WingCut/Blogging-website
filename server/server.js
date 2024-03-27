@@ -194,7 +194,9 @@ app.post("/login", (req, res) => {
 });
 
 //Lấy blog mới nhất
-app.get("/latest-blogs", (req, res) => {
+app.post("/latest-blogs", (req, res) => {
+  let { page } = req.body;
+
   const maxLimit = 5;
 
   Blog.find({ draft: false })
@@ -204,11 +206,24 @@ app.get("/latest-blogs", (req, res) => {
     )
     .sort({ publishedAt: -1 })
     .select("blog_id title des banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       res.status(200).json({ blogs });
     })
     .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+//phân trang blogs
+app.get("/latest-blogs-count", (req, res) => {
+  Blog.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalData: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
       return res.status(500).json({ error: err.message });
     });
 });
